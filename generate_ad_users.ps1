@@ -3,7 +3,6 @@ Import-Module ActiveDirectory
 
 $password = Read-Host "Enter password" -AsSecureString
 
-# want this to be OS agnostic; do input validation
 $file = Read-Host "Enter path to names text file"
 
 while (-Not $(Test-Path $file -PathType Leaf)){    
