@@ -6,6 +6,11 @@ $password = Read-Host "Enter password" -AsSecureString
 # want this to be OS agnostic; do input validation
 $file = Read-Host "Enter path to names text file"
 
+while (-Not $(Test-Path $file -PathType Leaf)){    
+    Write-Host "`nInvalid file path! Try again." -ForegroundColor Yellow
+    $file = Read-Host "`nEnter path to names text file"
+}
+
 # home lab example
 $ou = "OU=Regular Users,DC=laptopdomain,DC=local"
 
