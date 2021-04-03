@@ -9,26 +9,33 @@ Install CentOS 8 Stream
   select the option for Virtualization Host
   Enable your network connection
   
-Post install setup
+### Post install setup
+  ```markdown
   systemctl enable --now cockpit.socket
-  Determine IP address with "ip addr"
+  ```
+  Determine IP address
+    ```markdown
+    ip addr
+    ```
   At this point you can switch to a machine on the same network and use a browser to hit Cockpit at port 9090
-    In my case I am using a laptop with Fedora 32 Workstation installed
+  In my case I am using a laptop with Fedora 32 Workstation installed
   Once logged into Cockpit, use the menu on the left-hand side and select Terminal
-    This Terminal is nice because it lets you copy/paste from your workstation
+  This Terminal is nice because it lets you copy/paste from your workstation
   Change hostname to something meaningful. In my case I am going to have two KVM hosts, one this laptop and another a PC tower.
+    ```markdown
     hostnamectl set-hostname "kvm-laptop"
+    ```
   Install updates
     "yum install updates -y"
   Install virtual machine management for Cockpit 
     "yum install cockpit-machines -y"
   Optional reboot now to update the hostname and if there were kernel updates
   
-At this point there's a couple of important things I need to address in order to start creating VMs:
-  1. Create a storage pool for the virtual disks
-  2. Setup a bridged network so that each VM will be on the same network as the rest of my home lab
+## At this point there's a couple of important things I need to address in order to start creating VMs:
+##  1. Create a storage pool for the virtual disks
+##  2. Setup a bridged network so that each VM will be on the same network as the rest of my home lab
 
-Create storage pool for virtual disks
+### Create storage pool for virtual disks
   Determine where you have a lot of storage. Virtual disks can be hundreds of Gb's
     "df -h"
   In my case there's only 70Gb on the root filesystem but 850Gb for /home. So I will host the virtual disks there. Not ideal but it works.
@@ -56,11 +63,11 @@ Create storage pool for virtual disks
     "virsh pool-list"
   To see this in the GUI, navigate the Virtual Machines, and click on the Storage Pools link at the top
     
-Setup a bridged network
+### Setup a bridged network
   Used the following link as a guide: https://phoenixnap.com/kb/install-kvm-centos
   
-  IMPORTANT: as part of this process you will delete the current network interface, which will then disconnect you from Cockpit.
-             Do this process from a direct terminal on the KVM host.
+#  IMPORTANT: as part of this process you will delete the current network interface, which will then disconnect you from Cockpit.
+#             Do this process from a direct terminal on the KVM host.
         
   Identify the current network interface:
     nmcli connection show
@@ -81,6 +88,7 @@ Setup a bridged network
     nmcli connection up kvmbr1
   You should now see both kvmb1 and enp62s0u1 (in my case) as green
     nmcli connection show
+  Now you should be able to reconnect to Cockpit at the IP address you provided
   
   
   
