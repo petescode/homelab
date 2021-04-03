@@ -1,14 +1,13 @@
-## Welcome to kvm-cockpit blog
+# Setting up a KVM hypervisor with Cockpit
 
-KVM hypervisors managed by Cockpit for home lab
+In this walk-through I am using a laptop to build as a KVM hypervisor
 
-Dell Precision 5520
-I used a USB-C to Ethernet to get a hard network connection
+Laptop: Dell Precision 5520
 
-### Install CentOS 8 Stream
-select the option for Virtualization Host
-Enable your network connection
-  
+Since this laptop doesn't have an Ethernet port, I used a USB-C-to-Ethernet cable to
+
+Start by installing CentOS 8 Stream, select the option for Virtualization Host, and use the Enable toggle to automatically configure the network connection
+
 # Post install setup
 ```markdown
 systemctl enable --now cockpit.socket
@@ -18,9 +17,13 @@ Determine IP address
 ip addr
 ```
 At this point you can switch to a machine on the same network and use a browser to hit Cockpit at port 9090
+
 In my case I am using a laptop with Fedora 32 Workstation installed
+
 Once logged into Cockpit, use the menu on the left-hand side and select Terminal
+
 This Terminal is nice because it lets you copy/paste from your workstation
+
 Change hostname to something meaningful. In my case I am going to have two KVM hosts, one this laptop and another a PC tower.
 ```markdown
 hostnamectl set-hostname "kvm-laptop"
@@ -53,6 +56,7 @@ Since I don't like that I will just make a link to somewhere that looks nicer
 ln --symbolic /home/vm-storage/ /vm-storage
 ```
 Now I can point my disk files to simply /vm-storage
+
 I'll do the same sort of thing to create a place to store ISO files:
 ```markdown
 mkdir /home/vm-iso
@@ -65,6 +69,7 @@ wget https://download.fedoraproject.org/pub/fedora/linux/releases/33/Workstation
 ```
     
 The following steps can also be performed in the Cockpit GUI, but here I will stick to CLI.
+
 Check the default storage pool. Right now since we haven't yet attempted to create a VM, there shouldn't be one:
 ```markdown
 virsh pool-list
@@ -96,7 +101,9 @@ Identify the current network interface:
 nmcli connection show
 ```
 Ignore the virtual bridge interface (virbr0) for now.
+
 Take note of the name of the network device. For example, mine shows as "enp62s0u1"
+
 Delete the current network interface:
 ```markdown
 nmcli connection delete <uuid of your interface>
@@ -106,6 +113,7 @@ Create the new bridge interface:
 nmcli connection add type bridge autoconnect yes con-name kvmbr1 ifname kvmbr1
 ```
 Note here that I chose "kvmbr1" arbitrarily. I wanted to distinguish it from the other virtual bridge interface.
+
 Modify the connection settings to set the IP, gateway, and DNS server
 ```markdown
 nmcli connection modify kvmbr1 ipv4.addresses 10.X.X.X/24 ipv4.method manual
@@ -125,6 +133,11 @@ You should now see both kvmb1 and enp62s0u1 (in my case) as green
 nmcli connection show
 ```
 Now you should be able to reconnect to Cockpit at the IP address you provided
-  
+
+Create a test VM from the Virtual Machines menu.
+
+Once created, you should notice that the .qcow2 file (the virtual disk) is at the location you specified as the storage pool.
+
+Also notice that the VM by default has an IP address in the same network as the KVM host.
   
   
